@@ -143,7 +143,7 @@ class JiraMCP:
 
     # ─── Search Issues ────────────────────────────────────
     def search_issues(self, details: dict) -> dict:
-        project  = details.get("project", self.project_key)
+        project  = details.get("project") or self.project_key
         status   = details.get("status", "")
         assignee = details.get("assignee", "")
         keyword  = details.get("keyword", "")
@@ -159,27 +159,38 @@ class JiraMCP:
 
         jql = " AND ".join(jql_parts) + " ORDER BY created DESC"
 
-        url      = f"{self.base_url}/rest/api/3/search"
+        url      = f"{self.base_url}/rest/api/3/search/jql"
         response = requests.get(
             url,
             headers = self.headers,
             auth    = self.auth,
-            params  = {"jql": jql, "maxResults": 10, "fields": "summary,status,priority,assignee"}
+            params  = {
+                "jql":        jql,
+                "maxResults": 10,
+                "fields":     "summary,status,priority,assignee"
+            }
         )
 
         if response.status_code == 200:
-            data   = response.json()
-            issues = [{
-                "key":      i["key"],
-                "summary":  i["fields"]["summary"],
-                "status":   i["fields"]["status"]["name"],
-                "priority": i["fields"]["priority"]["name"] if i["fields"].get("priority") else "None",
-                "url":      f"{self.base_url}/browse/{i['key']}"
-            } for i in data.get("issues", [])]
+            data = response.json()
+
+            # ✅ /search/jql returns "issues" directly, total is optional
+            raw_issues = data.get("issues", [])
+            issues = []
+            for i in raw_issues:
+                fields = i.get("fields", {})
+                issues.append({
+                    "key":      i.get("key", ""),
+                    "summary":  fields.get("summary", "No summary"),
+                    "status":   fields.get("status", {}).get("name", "Unknown"),
+                    "priority": fields.get("priority", {}).get("name", "None") if fields.get("priority") else "None",
+                    "url":      f"{self.base_url}/browse/{i.get('key', '')}"
+                })
+
             return {
                 "status": "success",
                 "action": "search_issues",
-                "total":  data["total"],
+                "total":  len(issues),      # ✅ count ourselves instead of relying on API field
                 "issues": issues
             }
         else:
@@ -189,7 +200,6 @@ class JiraMCP:
                 "code":   response.status_code,
                 "detail": response.text
             }
-
     # ─── Get Single Issue ─────────────────────────────────
     def get_issue(self, issue_key: str) -> dict:
         url      = f"{self.base_url}/rest/api/3/issue/{issue_key}"
