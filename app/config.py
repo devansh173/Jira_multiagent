@@ -17,7 +17,7 @@ class Config:
     AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-oss-120b")
     AZURE_OPENAI_ENDPOINT   = os.getenv("AZURE_OPENAI_ENDPOINT")
     AZURE_OPENAI_API_KEY    = os.getenv("AZURE_OPENAI_API_KEY")
-
+    AZURE_FOUNDRY_PROJECT_ENDPOINT = os.getenv("AZURE_FOUNDRY_PROJECT_ENDPOINT")
     # ─── Jira ─────────────────────────────────────────────
     JIRA_BASE_URL     = os.getenv("JIRA_BASE_URL")
     JIRA_EMAIL        = os.getenv("JIRA_EMAIL")

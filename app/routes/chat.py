@@ -25,10 +25,16 @@ def chat():
     history = [row.to_dict() for row in history_rows]
 
     # ── Agent Pipeline ──────────────────────────────────
-    input_result    = process_input(message)                    # Agent 1
-    enriched        = enrich_with_context(history, input_result) # Agent 2
-    jira_result     = execute_jira_task(enriched)               # Agent 3
-    final_response  = generate_response(jira_result, message)   # Agent 4
+    print("Running agent pipeline...") # Debug log
+    print(f"User message: {message}")
+
+    input_result    = process_input(message)    
+    print(f"Input agent result: {input_result}")               
+    enriched        = enrich_with_context(history, input_result) 
+    print(f"Context agent result: {enriched}")
+    jira_result     = execute_jira_task(enriched)
+    print(f"Jira agent result: {jira_result}")              
+    final_response  = generate_response(jira_result, message)   
     # ────────────────────────────────────────────────────
 
     # Save to DB
