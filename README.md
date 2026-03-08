@@ -148,7 +148,7 @@ For example, if the user says `"update that ticket"` without specifying which ti
 
 ### Agent 3 — Jira Agent (`app/agents/jira_agent.py`)
 
-The third agent is the only one that **does not call an LLM**. It is pure deterministic routing — it reads the `intent` from Agent 2's output and calls the correct method on `JiraMCP`.
+The third agent is the only one that . It is pure deterministic routing — it reads the `intent` from Agent 2's output and calls the correct method on `JiraMCP`.
 
 ```python
 if intent == "create_ticket":   → jira.create_issue(details)
@@ -340,7 +340,7 @@ jira-multiagent/
 │   ├── agents/
 │   │   ├── input_agent.py       # Agent 1: parse intent + extract details
 │   │   ├── context_agent.py     # Agent 2: enrich with conversation history
-│   │   ├── jira_agent.py        # Agent 3: route to Jira API (no LLM)
+│   │   ├── jira_agent.py        # Agent 3: route to Jira API 
 │   │   └── response_agent.py    # Agent 4: format friendly response
 │   │
 │   ├── models/
@@ -391,7 +391,7 @@ JIRA_API_TOKEN=your-jira-api-token
 JIRA_PROJECT_KEY=SCRUM
 ```
 
-> ⚠️ Never commit `.env` to Git. Add it to `.gitignore` immediately.
+
 
 ---
 
