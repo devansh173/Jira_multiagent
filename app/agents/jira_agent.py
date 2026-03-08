@@ -1,19 +1,71 @@
-from app.mcp.jira_mcp import JiraMCP
+from azure.ai.agents.models import FunctionTool, ToolSet, MessageRole
+from app.utils.ai_client import get_project_client
+from app.utils.agent_manager import create_thread, cleanup
+from app.agents.jira_tools import jira_functions
+from app.config import Config
+import json
 
-jira = JiraMCP()
+INSTRUCTIONS = """
+You are a Jira operations agent. You have access to tools to:
+- Create Jira tickets
+- Update existing Jira tickets
+- Search and list tickets in a project
+- Get details of a specific ticket
+
+Based on the enriched request you receive, call the appropriate tool with the correct parameters.
+Always use the project key from the request. Return the raw tool result.
+"""
 
 def execute_jira_task(enriched_request: dict) -> dict:
-    intent  = enriched_request.get("intent", "")
-    details = enriched_request.get("extracted_details", {})
+    client    = get_project_client()
+    thread_id = create_thread(client)
 
-    if intent == "create_ticket":
-        return jira.create_issue(details)
-    elif intent == "update_ticket":
-        return jira.update_issue(details)
-    elif intent == "query_tickets":
-        return jira.search_issues(details)
-    elif intent == "get_ticket":
-        issue_key = details.get("ticket_id") or details.get("issue_key")
-        return jira.get_issue(issue_key)
-    else:
-        return {"status": "error", "detail": f"Unknown intent: {intent}"}
+    # Set up FunctionTool with all Jira functions
+    functions = FunctionTool(functions=jira_functions)
+    toolset   = ToolSet()
+    toolset.add(functions)
+
+    # Enable auto function calls — SDK handles tool execution automatically
+    client.agents.enable_auto_function_calls(toolset)
+
+    # Create the Foundry Agent with tools attached
+    agent = client.agents.create_agent(
+        model        = Config.AZURE_OPENAI_DEPLOYMENT,
+        name         = "jira-agent",
+        instructions = INSTRUCTIONS,
+        toolset      = toolset
+    )
+
+    try:
+        # Post the enriched request as the user message
+        client.agents.messages.create(
+            thread_id = thread_id,
+            role      = MessageRole.USER,
+            content   = f"Execute this Jira request: {json.dumps(enriched_request)}"
+        )
+
+        # Run — Foundry will automatically call the right Jira function
+        run = client.agents.runs.create_and_process(
+            thread_id = thread_id,
+            agent_id  = agent.id
+        )
+
+        if run.status == "failed":
+            return {"status": "error", "detail": f"Agent run failed: {run.last_error}"}
+
+        # Get agent's final response
+        messages = client.agents.messages.list(thread_id=thread_id)
+        for msg in messages:
+            if msg.role == MessageRole.AGENT:
+                for block in msg.content:
+                    if hasattr(block, "text"):
+                        # Try to parse as JSON, otherwise wrap in dict
+                        try:
+                            return json.loads(block.text.value)
+                        except json.JSONDecodeError:
+                            return {"status": "success", "response": block.text.value}
+
+        return {"status": "error", "detail": "No response from Jira agent"}
+
+    finally:
+        cleanup(client, agent.id, thread_id)
