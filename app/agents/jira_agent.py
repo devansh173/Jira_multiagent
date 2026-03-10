@@ -25,10 +25,10 @@ def execute_jira_task(enriched_request: dict) -> dict:
     toolset   = ToolSet()
     toolset.add(functions)
 
-    #
+    
     client.agents.enable_auto_function_calls(toolset)
 
-    # Create the Foundry Agent with tools attached
+    
     agent = client.agents.create_agent(
         model        = Config.AZURE_OPENAI_DEPLOYMENT,
         name         = "jira-agent",
@@ -44,7 +44,7 @@ def execute_jira_task(enriched_request: dict) -> dict:
             content   = f"Execute this Jira request: {json.dumps(enriched_request)}"
         )
 
-        # Run — Foundry will automatically call the right Jira function
+        
         run = client.agents.runs.create_and_process(
             thread_id = thread_id,
             agent_id  = agent.id
@@ -53,7 +53,7 @@ def execute_jira_task(enriched_request: dict) -> dict:
         if run.status == "failed":
             return {"status": "error", "detail": f"Agent run failed: {run.last_error}"}
 
-        # Get agent's final response
+        
         messages = client.agents.messages.list(thread_id=thread_id)
         for msg in messages:
             if msg.role == MessageRole.AGENT:
