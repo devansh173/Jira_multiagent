@@ -38,7 +38,7 @@ def create_jira_ticket(
         ac_list = json.loads(acceptance_criteria) if isinstance(acceptance_criteria, str) else acceptance_criteria
     except (json.JSONDecodeError, TypeError):
         ac_list = []
-
+    
     return json.dumps(jira.create_issue({
         "project":              project,
         "summary":              summary,
