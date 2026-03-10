@@ -52,7 +52,7 @@ mssql+pyodbc://<user>:<password>@<server>.database.windows.net/<dbname>?driver=O
 ## 5. Deploy the Model
 
 1. Inside your Foundry project go to **Models + endpoints** → **Deploy base model**
-2. Search for and deploy `gpt-4o-mini` with deployment name `gpt-4o-mini`
+2. Search for and deploy `gpt-oss-120b` with deployment name `gpt-oss-120b`
 3. From the project **Overview** copy the **Azure OpenAI endpoint** and **API Key**
 
 ---
@@ -122,7 +122,7 @@ az login
 
 Then start the server:
 ```bash
-python run.py
+python3.11 run.py
 ```
 
 App will be running at `http://127.0.0.1:5000`
@@ -144,14 +144,3 @@ App will be running at `http://127.0.0.1:5000`
 To check conversation history: `GET http://127.0.0.1:5000/history`
 
 ---
-
-## Troubleshooting
-
-| Error | Fix |
-|---|---|
-| `pyodbc` install fails on Mac | `brew reinstall unixodbc` then retry |
-| `Login timeout` on Azure SQL | Check DATABASE_URL credentials and SQL firewall rules |
-| `DefaultAzureCredential failed` | Run `az login` again |
-| Port 5000 in use | Kill the process using that port and restart |
-| `No module named 'app'` | Run `python run.py` from the project root folder |
-| SSL error on Azure SQL | Make sure `TrustServerCertificate=yes` is in your DATABASE_URL |
