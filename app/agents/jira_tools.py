@@ -38,7 +38,7 @@ def create_jira_ticket(
         ac_list = json.loads(acceptance_criteria) if isinstance(acceptance_criteria, str) else acceptance_criteria
     except (json.JSONDecodeError, TypeError):
         ac_list = []
-    
+
     return json.dumps(jira.create_issue({
         "project":              project,
         "summary":              summary,
@@ -153,7 +153,7 @@ def get_jira_transitions(ticket_id: str) -> str:
     return json.dumps(jira.get_transitions(ticket_id))
 
 
-# All functions registered as tools for the jira_agent FunctionTool
+
 jira_functions = {
     create_jira_ticket,
     update_jira_ticket,

@@ -15,10 +15,7 @@ class JiraMCP:
         self.headers    = {"Accept": "application/json", "Content-Type": "application/json"}
         self.project_key = Config.JIRA_PROJECT_KEY
 
-    # -------------------------------------------------------------------------
-    # INTERNAL HELPERS
-    # -------------------------------------------------------------------------
-
+   
     def _url(self, path: str) -> str:
         """Build full Jira API URL."""
         return f"{self.base_url}/rest/api/3/{path}"
@@ -95,9 +92,7 @@ class JiraMCP:
 
         return {"version": 1, "type": "doc", "content": content}
 
-    # -------------------------------------------------------------------------
-    # CREATE ISSUE
-    # -------------------------------------------------------------------------
+    
 
     def create_issue(self, details: dict) -> dict:
         """
@@ -134,7 +129,7 @@ class JiraMCP:
             }
         }
 
-        # story_points maps to customfield_10016 in most Jira Cloud instances
+        
         if story_points:
             payload["fields"]["customfield_10016"] = story_points
 
@@ -190,10 +185,7 @@ class JiraMCP:
             }
         return {"status": "error", "detail": resp.text, "code": resp.status_code}
 
-    # -------------------------------------------------------------------------
-    # GET ISSUE
-    # -------------------------------------------------------------------------
-
+    
     def get_issue(self, ticket_id: str) -> dict:
         """Get full details of a Jira issue."""
         resp = requests.get(
@@ -266,10 +258,7 @@ class JiraMCP:
             }
         return {"status": "error", "detail": resp.text, "code": resp.status_code}
 
-    # -------------------------------------------------------------------------
-    # GET TRANSITIONS  (new)
-    # -------------------------------------------------------------------------
-
+    
     def get_transitions(self, ticket_id: str) -> dict:
         """
         Get all available status transitions for a ticket.
@@ -293,10 +282,7 @@ class JiraMCP:
             }
         return {"status": "error", "detail": resp.text, "code": resp.status_code}
 
-    # -------------------------------------------------------------------------
-    # TRANSITION ISSUE  (new)
-    # -------------------------------------------------------------------------
-
+   
     def transition_issue(self, details: dict) -> dict:
         """
         Move a Jira issue to a new status.
@@ -329,7 +315,7 @@ class JiraMCP:
                 "available_transitions": available
             }
 
-        # Step 3 — apply the transition
+        
         resp = requests.post(
             self._url(f"issue/{ticket_id}/transitions"),
             json={"transition": {"id": transition_id}},
@@ -346,10 +332,7 @@ class JiraMCP:
             }
         return {"status": "error", "detail": resp.text, "code": resp.status_code}
 
-    # -------------------------------------------------------------------------
-    # ADD COMMENT  (new)
-    # -------------------------------------------------------------------------
-
+    
     def add_comment(self, details: dict) -> dict:
         """Add a comment to an existing Jira issue."""
         ticket_id = details.get("ticket_id")
@@ -386,10 +369,7 @@ class JiraMCP:
             }
         return {"status": "error", "detail": resp.text, "code": resp.status_code}
 
-    # -------------------------------------------------------------------------
-    # LINK ISSUES  (new)
-    # -------------------------------------------------------------------------
-
+   
     def link_issues(self, details: dict) -> dict:
         """
         Create a link between two Jira issues.

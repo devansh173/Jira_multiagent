@@ -20,12 +20,12 @@ def execute_jira_task(enriched_request: dict) -> dict:
     client    = get_project_client()
     thread_id = create_thread(client)
 
-    # Set up FunctionTool with all Jira functions
+   
     functions = FunctionTool(functions=jira_functions)
     toolset   = ToolSet()
     toolset.add(functions)
 
-    # Enable auto function calls — SDK handles tool execution automatically
+    #
     client.agents.enable_auto_function_calls(toolset)
 
     # Create the Foundry Agent with tools attached
@@ -37,7 +37,7 @@ def execute_jira_task(enriched_request: dict) -> dict:
     )
 
     try:
-        # Post the enriched request as the user message
+        
         client.agents.messages.create(
             thread_id = thread_id,
             role      = MessageRole.USER,
