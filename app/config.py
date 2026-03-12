@@ -23,3 +23,7 @@ class Config:
     JIRA_EMAIL        = os.getenv("JIRA_EMAIL")
     JIRA_API_TOKEN    = os.getenv("JIRA_API_TOKEN")
     JIRA_PROJECT_KEY  = os.getenv("JIRA_PROJECT_KEY", "SCRUM")
+
+    AZURE_DEVOPS_ORG     = os.getenv("AZURE_DEVOPS_ORG")
+    AZURE_DEVOPS_PROJECT = os.getenv("AZURE_DEVOPS_PROJECT")
+    AZURE_DEVOPS_PAT     = os.getenv("AZURE_DEVOPS_PAT")

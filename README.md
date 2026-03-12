@@ -52,7 +52,7 @@ mssql+pyodbc://<user>:<password>@<server>.database.windows.net/<dbname>?driver=O
 ## 5. Deploy the Model
 
 1. Inside your Foundry project go to **Models + endpoints** → **Deploy base model**
-2. Search for and deploy `gpt-oss-120b` with deployment name `gpt-oss-120b`
+2. Search for and deploy `gpt-oos-120b` with deployment name `gpt-oos-120b`
 3. From the project **Overview** copy the **Azure OpenAI endpoint** and **API Key**
 
 ---
